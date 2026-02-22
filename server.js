@@ -34,22 +34,36 @@ const writeNote = (note) => {
 
 // TODO: Handle GET request at the root route
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.htm"));
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 // Handle GET request to retrieve stored data
-app.get("/data", (req, res) => {
-  const note = readNote();
+app.get("/note", (req, res) => {
+  const note = noteData();
   res.json(note);
 });
 
 // Handle POST request to save new data with a unique ID
-app.post("/data", (req, res) => {
+app.post("/note", (req, res) => {
   const newNote = { id: uuidv4(), ...req.body };
-  const currentNote = readNote();
-  current.note(newNote);
+  const currentNote = noteData();
+  currentNote.push(newNote); 
   writeNote(currentNote);
   res.json({ message: "Note saved successfully", note: newNote });
 });
+
+// Handle DELETE request to delete data by ID
+app.delete("/note/:id", (req, res) => {
+  const notes = noteData();
+  const index = notes.findIndex((item) => item.id === req.params.id);
+  if (index === -1) {
+    return res.status(404).json({ message: "Note not found" });
+  }
+  const deletedItem = notes.splice(index, 1)[0];
+  writeNote(notes); 
+
+  res.json({ message: "Note deleted sucessfully", note: deletedItem });
+});
+
 
 // Handle POST request at the /echo route
 app.post("/echo", (req, res) => {
@@ -57,9 +71,21 @@ app.post("/echo", (req, res) => {
   res.json({ received: req.body });
 });
 
+// Handle PUT request to update data by ID
+app.put("/note/:id", (req, res) => {
+  const notes = noteData();
+  const item = notes.find((item) => item.id === req.params.id);
+  if (!item) {
+    return res.status(404).json({ message: "Note not found" });
+  }
+  item.text = req.body.note;
+  writeNote(notes);
+  res.json(item);
+});
+
 // Wildcard route to handle undefined routes
-app.all("*", (req, res) => {
-  res.status(404).send("Route not found");
+app.get(/(.*)/, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 // Start the server and listen on the specified port
