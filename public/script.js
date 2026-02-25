@@ -8,11 +8,11 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const response = await fetch("/note");
       const note = await response.json();
-      noteList.innerHTML = ""; // Clear the list before rendering
+      noteList.innerHTML = ""; 
       note.forEach((item) => {
         const li = document.createElement("li");
         li.textContent = item.text;
-          // Create a Delete button
+
       const delBtn = document.createElement("button");
       delBtn.textContent = "Delete";
       delBtn.style.marginLeft = "10px";
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
         await fetch(`/note/${item.id}`, { method: "DELETE" });
         fetchNote();
       });
-        // Create a Edit button
+      
       const editBtn = document.createElement("button");
       editBtn.textContent = "Edit";
       editBtn.style.marginLeft = "10px";

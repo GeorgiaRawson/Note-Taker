@@ -13,7 +13,7 @@ const PORT = 3001;
 // Middleware to parse incoming JSON requests
 app.use(express.json());
 
-// TODO:  Serve static files from the 'public' directory
+// Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, "public")));
 // Define the path to the JSON file
 const noteFilePath = path.join(__dirname, "data.json");
@@ -32,17 +32,18 @@ const writeNote = (note) => {
   fs.writeFileSync(noteFilePath, JSON.stringify(note, null, 2));
 };
 
-// TODO: Handle GET request at the root route
+// GET request at the root route
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
-// Handle GET request to retrieve stored data
+
+// GET request to retrieve stored data
 app.get("/note", (req, res) => {
   const note = noteData();
   res.json(note);
 });
 
-// Handle POST request to save new data with a unique ID
+// POST request to save new data with a unique ID
 app.post("/note", (req, res) => {
   const newNote = { id: uuidv4(), ...req.body };
   const currentNote = noteData();
@@ -51,7 +52,7 @@ app.post("/note", (req, res) => {
   res.json({ message: "Note saved successfully", note: newNote });
 });
 
-// Handle DELETE request to delete data by ID
+// DELETE request to delete data by ID
 app.delete("/note/:id", (req, res) => {
   const notes = noteData();
   const index = notes.findIndex((item) => item.id === req.params.id);
@@ -65,20 +66,19 @@ app.delete("/note/:id", (req, res) => {
 });
 
 
-// Handle POST request at the /echo route
+// POST request at the /echo route
 app.post("/echo", (req, res) => {
-  // Respond with the same data that was received in the request body
   res.json({ received: req.body });
 });
 
-// Handle PUT request to update data by ID
+// PUT request to update data by ID
 app.put("/note/:id", (req, res) => {
   const notes = noteData();
   const item = notes.find((item) => item.id === req.params.id);
   if (!item) {
     return res.status(404).json({ message: "Note not found" });
   }
-  item.text = req.body.note;
+  item.text = req.body.text;
   writeNote(notes);
   res.json(item);
 });
@@ -88,7 +88,7 @@ app.get(/(.*)/, (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-// Start the server and listen on the specified port
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
